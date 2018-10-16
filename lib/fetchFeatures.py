@@ -36,7 +36,7 @@ def requests_retry_session(
 os.chdir("../data")
 df=pd.read_csv("DtcDrugTargetInteractions.csv", usecols=['standard_inchi_key', 'target_id'],dtype={'standard_inchi_key': object})
 print(df.shape)
-'''
+
 ####1.Fetch chemical structures
 #declare feature lists
 smiles_list=[]
@@ -53,7 +53,7 @@ for key in uniqueDrugs:
 		results = pcp.get_compounds(key, type)
 		if results==[]:
 			#for missing compounds we can search using another key such as name
-			missing=missing+1
+			missingDrugs=missingDrugs+1
 			continue
 		#take the first result here, should be fine because smiels are unique I think
 		smiles_list.append(results[0].to_dict(properties=['canonical_smiles']))
@@ -61,7 +61,7 @@ for key in uniqueDrugs:
 
 print(smiles_list)
 print(missingDrugs)
-'''
+
 ####2.Fetch protein sequence
 seq_list=[]
 
