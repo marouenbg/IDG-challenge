@@ -3,9 +3,34 @@ import pandas as pd #data loading
 import os #to change dir
 import requests #query uniprot
 from Bio import SeqIO #parse fasta
+from requests.adapters import HTTPAdapter #for retries
+from requests.packages.urllib3.util.retry import Retry
 
 def isNaN(num):
-    return num != num
+	return num != num
+
+def requests_retry_session(
+	###########
+	#from: https://www.peterbe.com/plog/best-practice-with-retries-with-requests
+	###########
+	retries=3,
+	backoff_factor=0.3,
+	status_forcelist=(500, 502, 504),
+    	session=None,
+	):
+	session = session or requests.Session()
+	retry = Retry(
+		total=retries,
+		read=retries,
+		connect=retries,
+		backoff_factor=backoff_factor,
+		status_forcelist=status_forcelist,
+    		)
+	adapter = HTTPAdapter(max_retries=retry)
+	session.mount('http://', adapter)
+	session.mount('https://', adapter)
+	return session
+
 
 #read drugcommons db
 os.chdir("../data")
@@ -48,9 +73,9 @@ print(len(uniqueProt))
 missingProts=0
 for prot in uniqueProt:
 	if not isNaN(prot):
-		r=requests.get('https://www.uniprot.org/uniprot/' + prot + '.fasta')
+		r=requests_retry_session().get('https://www.uniprot.org/uniprot/' + prot + '.fasta', timeout=100)
 		if r.status_code != requests.codes.ok:
-			missingProt=missingProt+1
+			missingProts=missingProts+1
 			continue
 		#parsing fasta with biopython requeries a file
 		text_file = open("prot.fasta", "w")
@@ -62,4 +87,5 @@ for prot in uniqueProt:
 		#deleting file
 		os.remove("prot.fasta")
 
+print(seq_list)
 print(missingProts)
