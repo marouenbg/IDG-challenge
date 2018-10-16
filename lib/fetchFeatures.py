@@ -39,7 +39,7 @@ print(df.shape)
 
 ####1.Fetch chemical structures
 #declare feature lists
-smiles_list=[]
+smiles_dict={}
 
 #fetch canonical smiles
 type='inchikey' #query by inchi key
@@ -56,14 +56,15 @@ for key in uniqueDrugs:
 			missingDrugs=missingDrugs+1
 			continue
 		#take the first result here, should be fine because smiels are unique I think
-		smiles_list.append(results[0].to_dict(properties=['canonical_smiles']))
+		smiles=results[0].to_dict(properties=['canonical_smiles'])
+		smiles_dict.update({key:smiles['canonical_smiles']})
 
 
-print(smiles_list)
+print(smiles_dict)
 print(missingDrugs)
 
 ####2.Fetch protein sequence
-seq_list=[]
+seq_dict={}
 
 #Unique protein IDs
 uniqueProt=df["target_id"].unique()
@@ -83,9 +84,9 @@ for prot in uniqueProt:
 		text_file.close()
 
 		for record in SeqIO.parse("prot.fasta", "fasta"):
-			seq_list.append(record.seq)
+			seq_dict.update({prot:record.seq})
 		#deleting file
 		os.remove("prot.fasta")
 
-print(seq_list)
+print(seq_dict)
 print(missingProts)
