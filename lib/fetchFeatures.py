@@ -53,6 +53,7 @@ uniqueDrugs=df["standard_inchi_key"].unique()
 '''
 missingDrugs=0 #missing compounds
 for key in uniqueDrugs:
+	print(key)
 	if not isNaN(key):
 		results = pcp.get_compounds(key, type)
 		if results==[]:
@@ -109,14 +110,14 @@ for i in range(df.shape[0]):
 	drug=df["standard_inchi_key"].iloc[i]
 	#only take pkd assays in NM because in the webinar, they said that assays reported in % are not reliable, will get back to that
 	if not isNaN(drug) and not isNaN(prot) and df["standard_type"].iloc[i]=='KDAPP' and df["standard_units"].iloc[i]=="NM":
-		rowId.append( np.where(rownames==prot) )
-		colId.append( np.where(colnames==drug) )
+		rowId.append( np.where(rownames==prot)[0][0] )
+		colId.append( np.where(colnames==drug)[0][0] )
 		# I did not consider values that repeat; maybe average them
 		#assume equality for now
 		data.append(-math.log(df["standard_value"].iloc[i],10))
 
 #build sparse matrix (0 can be treated as a missing value)
 pkdMat = sparse.coo_matrix((data, (rowId, colId)))
-#save
+#save (4951 interaction rows 317, cols 213)
 sparse.save_npz('pkdMat.npz', pkdMat)
 
