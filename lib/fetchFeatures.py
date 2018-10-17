@@ -100,7 +100,7 @@ for key in uniqueDrugs[np.unique(colId)]:
 print(missingDrugs)
 np.save('chemStructure.npy', smiles_dict) 
 
-####2.Fetch protein sequence
+####3.Fetch protein sequence
 seq_dict={}
 
 missingProts=0
