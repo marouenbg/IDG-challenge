@@ -1,0 +1,15 @@
+10**24 molecules with bioactivities 
+Reymond et al 2014
+
+dewry et al plos one 2017 -> description of challenge
+
+chiconska et al plos combio 2017 -> pairwise kernel 
+
+Drug target commons platform drugtargetcommons.fimm.fi
+tang et al cell chem bilogy 2018
+
+percent inhibio is used on one value : unrelaibel 
+pubchem, chembl, IDG pharos
+
+github code to calculate metrics
+
