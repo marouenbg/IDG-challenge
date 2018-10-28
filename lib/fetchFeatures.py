@@ -86,14 +86,29 @@ sparse.save_npz('relMat.npz', relMat)
 print(len(rowId))
 print(len(colId))
 
-####2.Fetch chemical structures
+####2.Fetch chemical structures AND other features
 #declare feature lists
+#these are the drug smiles dictioanry using the inchi keys as keys
 smiles_dict={}
+#this is the cactvs fingerprint dictionary using the inchi keys as keys
+cactvsFingerprint_dict={}
 
 #fetch canonical smiles
 type='inchikey' #query by inchi key
+otherFeaturesName=["atom_stereo_count", "bond_stereo_count", "charge","complexity", \
+"covalent_unit_count","defined_atom_stereo_count", "exact_mass", "h_bond_acceptor_count", \
+"h_bond_donor_count","heavy_atom_count","isotope_atom_count", "molecular_weight", \
+"monoisotopic_mass","rotatable_bond_count", "tpsa", "xlogp"]
 
+#Int: bonds, atoms, elements, fingerprint, molecular formula, record
+
+#the following dataframe contains a set of nuelrical features collected from pubchem
+#the columns are features from the otehrFeaturesName list
+#the rowas are the drugs listed in keys_list variable by inchi keys
+chemFeatMat= pd.DataFrame(columns=otherFeaturesName)
 missingDrugs=0 #missing compounds
+counter=0
+keys_list=list()
 for key in uniqueDrugs[np.unique(colId)]:
 	print(key)
 	if not isNaN(key):
@@ -107,15 +122,32 @@ for key in uniqueDrugs[np.unique(colId)]:
 			missingDrugs=missingDrugs+1
 			print('missing')
 			continue
+		counter=counter+1
 		#take the first result here, should be fine because smiles are unique I think
 		smiles=results[0].to_dict(properties=['canonical_smiles'])
 		smiles_dict.update({key:smiles['canonical_smiles']})
-
+		#cactvs fingerprint
+		cactvs=results[0].to_dict(properties=["fingerprint"])
+		cactvsFingerprint_dict.update({key:cactvs['fingerprint']})
+		#other features
+		otherFeat=results[0].to_dict(properties=otherFeaturesName)
+		chemFeatMat.loc[counter]=np.zeros(len(otherFeaturesName))
+		chemFeatMat.loc[counter]=otherFeat.values()
+		#keys name
+		keys_list.append(key)
 
 #print(smiles_dict)
 print(missingDrugs)
 np.save('chemStructure.npy', smiles_dict) 
-
+np.save("cactvsFingerprint.npy", cactvsFingerprint_dict)
+#save key names: these are the inchi key of drugs (rows)
+#the columns names are the featrues name (otehrFetaures variable)
+with open('drug_names.txt', 'w') as f:
+    for key in keys_list:
+        f.write("%s\n" % key)
+#save the other features matrix
+chemFeatMat.to_csv("chemFeatMat.csv",sep=',')
+'''
 ####3.Fetch protein sequence
 seq_dict={}
 
@@ -141,3 +173,4 @@ for prot in np.array(uniqueProt)[np.unique(rowId)]:
 print(missingProts) #1 records are missing
 np.save('protStructure.npy', seq_dict) 
 
+'''
