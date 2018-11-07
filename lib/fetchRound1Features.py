@@ -130,24 +130,30 @@ np.save('Round1_protStructure.npy', seq_dict)
 kinaseDict={}
 ATPDict   ={}
 
-count=0
-missing=0
+amissing,kmissing,count=0,0,0
 for key, sequence in seq_dict.items():
 	count=count+1
-	print(count)
+	print(key)
 	if count % 50 ==0:
 		time.sleep(60) # sleep 1 mn for very 50 query to avoid timeout
 	handle = ScanProsite.scan(seq=sequence)
 	result = ScanProsite.read(handle)
+	kinase,atp=0,0
 	for i in range(len(result)): #I am looping over all results but there should be only one that ha$
 		if result[i]['signature_ac']=='PS50011': # Protein kinase domain
 			kinaseDict[key]=sequence[result[i]['start']:result[i]['stop']]
+			kinase=1
 		elif result[i]['signature_ac']=='PS00107': # ATP binding pocket
 			ATPDict[key]=sequence[result[i]['start']:result[i]['stop']]
-		else:
-			missing=missing+1
-			print('missing')
+			atp=1
+	if kinase==0:
+		kmissing=kmissing+1
+		print('kinase missing')
+	if atp==0:
+		amissing=amissing+1
+		print('atp missing')
 
-print(missing)
+print(kmissing)
+print(amissing)
 np.save('Round1_kinaseDomain.npy', kinaseDict)
 np.save('Round1_ATPDomain.npy', ATPDict)
