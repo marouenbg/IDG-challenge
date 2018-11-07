@@ -137,7 +137,7 @@ for key in uniqueDrugs[np.unique(colId)]:
 		keys_list.append(key)
 
 #print(smiles_dict)
-print(missingDrugs)
+print(missingDrugs) #414
 np.save('chemStructure.npy', smiles_dict) 
 np.save("cactvsFingerprint.npy", cactvsFingerprint_dict)
 #save key names: these are the inchi key of drugs (rows)
@@ -147,7 +147,7 @@ with open('drug_names.txt', 'w') as f:
         f.write("%s\n" % key)
 #save the other features matrix
 chemFeatMat.to_csv("chemFeatMat.csv",sep=',')
-'''
+
 ####3.Fetch protein sequence
 seq_dict={}
 
@@ -173,4 +173,4 @@ for prot in np.array(uniqueProt)[np.unique(rowId)]:
 print(missingProts) #1 records are missing
 np.save('protStructure.npy', seq_dict) 
 
-'''
+
